@@ -6,18 +6,29 @@ from mesa.visualization.modules import CanvasGrid
 
 import nest_asyncio
 
-
 if __name__ == "__main__":
 
-    nest_asyncio.apply()
+        height = 10
+        width = 10
+        moto_number = 10
+        van_number = 5
+        business_number = 7
 
-    grid = CanvasGrid(agent_portrayal, 20, 20, 500, 500)
+        nest_asyncio.apply()
 
-    server = ModularServer(LastMileModel,
-                           [grid],
-                           "Last Mile Model",
-                           {"N_moto": 50, "N_van": 50, "N_business": 7, "width": 20, "height": 20})
+        grid = CanvasGrid(agent_portrayal, height, width, 500, 500)
 
-    server.port = 8517  # The default
+        server = ModularServer(
+                LastMileModel,
+                [grid],
+                "Last Mile Model",
+                {"N_moto": moto_number,
+                 "N_van": van_number,
+                 "N_business": business_number,
+                 "width": width,
+                 "height": height}
+        )
 
-    server.launch()
+        server.port = 8517  # The default
+
+        server.launch()

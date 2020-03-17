@@ -37,6 +37,7 @@ class LastMileModel(Model):
                 # Create Business
                 for loc in self.business_locations:
                         b = Business(loc, self)
+                        self.schedule.add(b)
                         self.grid.place_agent(b, loc)
 
                 # Create Agents
