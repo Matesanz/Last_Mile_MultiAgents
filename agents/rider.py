@@ -3,18 +3,27 @@ import numpy as np
 import agents.places
 
 class Rider(Agent):
-        """ An agent that goes from A to B """
+        """
+        An agent that goes from A to B to Drop a Pack
+        """
 
         def __init__(self, unique_id, model):
                 super().__init__(unique_id, model)
 
                 self.packs = []
                 self.max_packs = 1
+                self.total_packs = 0
                 self.patience = 3
                 self.base_location = self.model.base_location
                 self.active = False
 
         def step(self):
+                """
+                If Rider is in working time moves towards Business
+                when he does have Packs or towards Base when he doesn't.
+                If he is at Target drops the PAck if Business is open.
+                If Closed waits until opens or until Patience turns into 0.
+                """
 
                 # If rider is active: works
                 if self.active:
@@ -27,11 +36,12 @@ class Rider(Agent):
                         if self.packs:
 
                                 if self.is_rider_in_destiny():
-                                        # print("i dropped the pack")
+
                                         if self.is_business_open():
+                                                # Drops the Pack
                                                 self.drop_pack()
                                         else:
-                                                print('Business is closed')
+                                                # Business is Closed
                                                 self.patience -= 1
                                                 if self.patience == 0:
                                                         self.put_pack_to_bottom_of_list()
@@ -48,6 +58,11 @@ class Rider(Agent):
                         pass
 
         def move(self, destiny):
+                '''
+
+                :param  destiny: tuple(x,y): coordinates to move towards
+                :return:
+                '''
 
                 # Calculates direction vector towards destiny
                 direction = np.subtract(destiny, self.pos)
@@ -68,18 +83,31 @@ class Rider(Agent):
                 self.model.grid.move_agent(self, new_position)
 
         def is_rider_able_to_work(self):
+                '''
+                Returns whether Rider is able or not to work
+                '''
                 return self.active
 
         def change_rider_working_status(self, status):
+                '''
+                changer whether Rider is able or not to work
+                '''
                 self.active = status
 
         def is_business_open(self):
+                '''
+                Checks if business at same location is open
+                '''
                 this_cell = self.model.grid.iter_cell_list_contents([self.pos])
                 business = [obj for obj in this_cell
                             if isinstance(obj, agents.places.Business)][0]
                 return business.open
 
         def put_pack_to_bottom_of_list(self):
+                '''
+                If Patience turns 0 puts Pack at the beginning of list
+                '''
+
                 last_pack = self.packs[-1]
                 # remove last pack
                 self.packs.pop()
@@ -87,36 +115,61 @@ class Rider(Agent):
                 self.packs.insert(0, last_pack)
 
         def drop_pack(self):
-
+                '''
+                Drops the pack at destiny
+                '''
+                self.total_packs += 1
                 self.packs.pop()
-                # print(self.packs)
 
         def pick_pack(self, pack):
-
+                '''
+                Picks Pack at Base
+                :param pack: Pack Object
+                '''
                 self.packs.append(pack)
 
-        def set_destiny(self, destiny):
-                self.destiny = destiny
-                # print('my new destiny is ', self.destiny)
-
         def is_rider_in_destiny(self):
+                '''
+                Returns True if Rider is at destiny
+                '''
                 return (self.pos == self.packs[-1].destination)
 
         def is_rider_in_base(self):
+                '''
+                Returns True if Rider is at Base
+                '''
                 return (self.pos == self.base_location)
 
         def is_rider_full(self):
+                '''
+                Returns True if Rider is full of Packs
+                '''
                 return (len(self.packs) == self.max_packs)
+
+        def reset_dropped_packs_counter(self):
+                '''
+                Resets Rider dropped Packs to 0
+                '''
+                self.total_packs = 0
+
+        def nb_dropped_packs(self):
+                return self.total_packs
 
 
 class Moto(Rider):
+        '''
+        Rider class with 1 Pack maximum
+        '''
 
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
-        self.max_packs = 1
+        def __init__(self, unique_id, model):
+                super().__init__(unique_id, model)
+                self.max_packs = 1
 
 class Van(Rider):
+        '''
+        Rider class with 2 Packs maximum
+        '''
 
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
-        self.max_packs = 2
+        def __init__(self, unique_id, model):
+                super().__init__(unique_id, model)
+                self.max_packs = 2
