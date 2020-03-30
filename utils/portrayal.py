@@ -3,6 +3,13 @@ from agents.places import Business, Base
 
 
 def agent_portrayal(agent):
+
+        '''
+        Portrayal Object that renders Agents on Browser
+        :param agent: to be rendered by Browser
+        :return: Dict with Agents Properties
+        '''
+
         portrayal = {"Shape": "resources/moto.png",
                      "Layer": 3,
                      "scale": 0.9}
